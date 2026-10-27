@@ -1,50 +1,81 @@
 # Download Sorter
 
-A friendly, dependency-free desktop GUI for Zorin OS that keeps `~/Downloads` tidy. It can organize files on demand or run automatically every day at a chosen time. New files are classified into Photos, Screenshots, Videos, Audio, Documents, Archives, Code, or Others.
+A friendly, dependency-free desktop GUI for Zorin OS that keeps `~/Downloads` tidy. It organizes files on demand or automatically every day at a chosen time. New files are classified into Photos, Screenshots, Videos, Audio, Documents, Archives, Code, or Others.
 
 ## Features
 
 - Native-looking Tkinter GUI; no server and no external Python packages.
-- Watches a configurable folder and sorts its top-level files into category folders.
-- Daily scheduler with editable 24-hour time such as `18:00`.
+- Organizes top-level files from a configurable folder into category folders.
+- Daily scheduler with an editable 24-hour time such as `18:00`.
 - Safe duplicate handling: existing files are never overwritten; duplicates become `name (1).ext`.
-- Screenshot detection by filename, including files such as `Screenshot from 2026-10-27.png`.
+- Screenshot detection by filename, including `Screenshot from 2026-10-27.png`.
 - Optional hidden-file handling and configurable source/destination folders.
-- `.desktop` launcher for the Zorin application menu.
+- User-level installation; no `sudo` is required for the app itself.
 
-## Run on Zorin OS
+## Install on Zorin OS (recommended)
 
-```bash
-python3 app.py
-```
-
-Tkinter is normally included with Zorin OS. If it is missing:
+These commands work regardless of where you clone the repository:
 
 ```bash
 sudo apt update
-sudo apt install python3-tk
+sudo apt install -y python3 python3-tk git
+
+git clone https://github.com/aviyukttt/download-sorter.git
+cd download-sorter
+chmod +x install.sh uninstall.sh
+./install.sh
 ```
 
-Then launch **Download Sorter** from the application menu by installing the desktop file:
+After installation, open the application menu and search for **Download Sorter**. You can also launch it directly:
 
 ```bash
-mkdir -p ~/.local/share/applications
-cp download-sorter.desktop ~/.local/share/applications/
-# Update the Exec/Icon paths if you cloned this repo somewhere other than ~/download-sorter.
+python3 "$HOME/.local/share/download-sorter/app.py"
 ```
 
-The first run defaults to `~/Downloads`, sorts into category subfolders inside `~/Downloads`, and schedules the daily run at 18:00. Settings are stored at `~/.config/download-sorter/config.json`.
+The installer copies the app to `~/.local/share/download-sorter/` and generates the desktop launcher at `~/.local/share/applications/download-sorter.desktop`. It does not assume that the repository is located in `/home/ubuntu` or any other specific directory.
 
-## Autostart at login (optional)
+### Enable automatic start at login
 
-To keep the daily scheduler active after login:
+The daily scheduler runs while the app is open. To start the app automatically whenever you log in:
 
 ```bash
-mkdir -p ~/.config/autostart
-cp download-sorter.desktop ~/.config/autostart/
+cd download-sorter
+./install.sh --autostart
 ```
 
-The app stays open as a small GUI window; minimize it if desired. The daily job runs only while the app is running.
+The app opens as a normal GUI window; minimize it if you do not want it in the foreground. The default daily run time is 18:00 and can be changed in the app.
+
+### Upgrade to a newer version
+
+```bash
+cd download-sorter
+git pull
+./install.sh
+```
+
+If autostart was already enabled, run `./install.sh --autostart` after pulling so the autostart copy is refreshed too.
+
+### Uninstall
+
+From the repository directory, run:
+
+```bash
+./uninstall.sh
+```
+
+This removes the installed app, application-menu launcher, and autostart entry. It does **not** delete your Downloads, organized files, or settings at `~/.config/download-sorter/config.json`.
+
+## First-run behavior
+
+The first run defaults to `~/Downloads`, sorts into category subfolders inside `~/Downloads`, and schedules the daily run at 18:00. Change the source folder, destination folder, time, and monitoring options in the GUI, then click **Save settings**.
+
+## Troubleshooting
+
+**The application does not appear in the menu:** log out and back in, or run `update-desktop-database ~/.local/share/applications` if that command is available. You can always launch it directly with the command above.
+
+**The installer says Tkinter is missing:** run `sudo apt update && sudo apt install -y python3-tk`, then run `./install.sh` again.
+
+**The daily job does not run:** make sure the GUI is running and **Automatically watch for new files** is enabled. This app is intentionally a user-session application; it does not run while you are logged out.
 
 ## Categories
 
@@ -59,9 +90,7 @@ The app stays open as a small GUI window; minimize it if desired. The daily job 
 | Code | Python, JavaScript, TypeScript, HTML, CSS, JSON, YAML, shell, and more |
 | Others | Files that do not match the above rules |
 
-## Tests
-
-Run the dependency-free unit tests:
+## Development and tests
 
 ```bash
 python3 -m unittest discover -s tests -v
