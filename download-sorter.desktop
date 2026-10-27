@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Download Sorter
+Comment=Automatically organize your Downloads folder
+Exec=python3 /home/ubuntu/download-sorter/app.py
+Icon=folder-download
+Terminal=false
+Categories=Utility;FileTools;
+StartupNotify=true
